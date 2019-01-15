@@ -93,15 +93,27 @@ export default class MyEditor extends Component {
   render() {
     return (
       <div id="shell">
-        <div id="header">Toolbar</div>
-        <Editor
-          ref={this.ref}
-          placeholder="Start writing.."
-          value={this.state.value}
-          onChange={this.onChange}
-          plugins={plugins}
-          renderMark={this.renderMark}
-        />
+        <div id="header">
+          <div className="wrapper">
+            <div id="toolbar">
+              <button>Heading</button>
+            </div>
+            <div id="menu">
+              <button>Cancel</button>
+              <button>Save</button>
+            </div>
+          </div>
+        </div>
+        <div id="paper" className="wrapper">
+          <Editor
+            ref={this.ref}
+            placeholder="Start writing.."
+            value={this.state.value}
+            onChange={this.onChange}
+            plugins={plugins}
+            renderMark={this.renderMark}
+          />
+        </div>
       </div>
     );
   }
