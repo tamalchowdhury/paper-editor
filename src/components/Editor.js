@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { Editor } from 'slate-react';
 import { Value } from 'slate';
 import initialValue from './_value';
-const value = Value.fromJSON(initialValue);
+import Icon from './Icon';
 
 document.title = 'Slate Editor Project';
+const value = Value.fromJSON(initialValue);
 
 function MarkHotkeys(options) {
   let { key, type } = options;
@@ -38,6 +39,25 @@ export default class MyEditor extends Component {
   };
 
   ref = (editor) => (this.editor = editor);
+
+  hasBlock = (type) => {
+    let { value } = this.state;
+    return value.blocks.some((node) => node.type === type);
+  };
+
+  renderBlockButton = (type, name) => {
+    let isActive = this.hasBlock(type);
+
+    if (type === 'numbered-list' || type === 'bulleted-list') {
+      let { value } = this.state;
+      if (value.blocks.size > 0) {
+        let parent = value.document.getParent(value.blocks.first().key);
+        isActive = this.hasBlock('list-item') && parent && parent.type === type;
+      }
+    }
+
+    return <button>{name}</button>;
+  };
 
   // Render Mark Function
   renderMark = (props, editor, next) => {
@@ -96,7 +116,11 @@ export default class MyEditor extends Component {
         <div id="header">
           <div className="wrapper">
             <div id="toolbar">
-              <button>Heading</button>
+              {this.renderBlockButton('heading-one', 'H1')}
+              {this.renderBlockButton('heading-two', 'H2')}
+              {this.renderBlockButton('block-quote', 'Quote')}
+              {this.renderBlockButton('numbered-list', 'ol')}
+              {this.renderBlockButton('bulleted-list', 'ul')}
             </div>
             <div id="menu">
               <button>Cancel</button>
