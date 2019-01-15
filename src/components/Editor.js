@@ -6,6 +6,9 @@ import Icon from './Icon';
 
 document.title = 'Slate Editor Project';
 const value = Value.fromJSON(initialValue);
+const DEFAULT_NODE = 'paragraph';
+
+function insertImage(editor, src, target) {}
 
 function MarkHotkeys(options) {
   let { key, type } = options;
@@ -56,7 +59,86 @@ export default class MyEditor extends Component {
       }
     }
 
-    return <button>{name}</button>;
+    return (
+      <button onClick={(event) => this.activateBlock(event, type)}>
+        {name}
+      </button>
+    );
+  };
+
+  activateBlock = (event, type) => {
+    event.preventDefault();
+
+    const { editor } = this;
+    const { value } = editor;
+    const { document } = value;
+    const { alert } = this.props;
+
+    if (['image'].includes(type)) {
+      // Show URl prompt
+      this.getImageUrlPrompt();
+    }
+
+    if (['imageBrowser'].includes(type)) {
+      /**
+       * Convert image in base64
+       * Validate Image type
+       *
+       * @param {File} file
+       */
+      const getBase64 = (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          if (file.type !== 'image/jpeg') {
+            alert.error('Only JPEG file');
+            return;
+          }
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (error) => reject(error);
+        });
+      getBase64(event.currentTarget.files[0]).then((imageData) => {
+        // Show image in editor
+        editor.command(insertImage, imageData);
+      });
+    }
+
+    // Handle everything but list buttons.
+    if (type !== 'bulleted-list' && type !== 'numbered-list') {
+      const isActive = this.hasBlock(type);
+      const isList = this.hasBlock('list-item');
+
+      if (isList) {
+        editor
+          .setBlocks(isActive ? DEFAULT_NODE : type)
+          .unwrapBlock('bulleted-list')
+          .unwrapBlock('numbered-list');
+      } else {
+        editor.setBlocks(isActive ? DEFAULT_NODE : type);
+      }
+    } else {
+      // Handle the extra wrapping required for list buttons.
+      const isList = this.hasBlock('list-item');
+      const isType = value.blocks.some(
+        (block) =>
+          !!document.getClosest(block.key, (parent) => parent.type === type)
+      );
+
+      if (isList && isType) {
+        editor
+          .setBlocks(DEFAULT_NODE)
+          .unwrapBlock('bulleted-list')
+          .unwrapBlock('numbered-list');
+      } else if (isList) {
+        editor
+          .unwrapBlock(
+            type === 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
+          )
+          .wrapBlock(type);
+      } else {
+        editor.setBlocks('list-item').wrapBlock(type);
+      }
+    }
   };
 
   // Render Mark Function
@@ -78,8 +160,8 @@ export default class MyEditor extends Component {
     }
   };
 
-  // Render Block Function
-  renderBlock = (props, editor, next) => {
+  // Render Node Function
+  renderNode = (props, editor, next) => {
     let { node, attributes, children } = props;
     switch (node.type) {
       case 'heading-one':
@@ -136,6 +218,7 @@ export default class MyEditor extends Component {
             onChange={this.onChange}
             plugins={plugins}
             renderMark={this.renderMark}
+            renderNode={this.renderNode}
           />
         </div>
       </div>
