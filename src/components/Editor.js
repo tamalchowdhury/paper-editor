@@ -4,6 +4,8 @@ import { Value } from 'slate';
 import initialValue from './_value';
 const value = Value.fromJSON(initialValue);
 
+document.title = 'Slate Editor Project';
+
 function MarkHotkeys(options) {
   let { key, type } = options;
   return {
@@ -51,6 +53,38 @@ export default class MyEditor extends Component {
         return <code {...attributes}>{children}</code>;
       case 'strikethrough':
         return <del {...attributes}>{children}</del>;
+      default:
+        return next();
+    }
+  };
+
+  // Render Block Function
+  renderBlock = (props, editor, next) => {
+    let { node, attributes, children } = props;
+    switch (node.type) {
+      case 'heading-one':
+        return <h1 {...attributes}>{children}</h1>;
+      case 'heading-two':
+        return <h2 {...attributes}>{children}</h2>;
+      case 'paragraph':
+        return <p {...attributes}>{children}</p>;
+      case 'blockquote':
+        return <blockquote {...attributes}>{children}</blockquote>;
+      case 'bulleted-list':
+        return <ul {...attributes}>{children}</ul>;
+      case 'numbered-list':
+        return <ol {...attributes}>{children}</ol>;
+      case 'list-item':
+        return <li {...attributes}>{children}</li>;
+      case 'code':
+        return (
+          <pre {...attributes}>
+            <code>{children}</code>
+          </pre>
+        );
+      case 'image':
+        let src = node.data.get('src');
+        return <img src={src} {...attributes} />;
       default:
         return next();
     }
