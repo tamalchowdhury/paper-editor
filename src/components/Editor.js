@@ -78,8 +78,10 @@ export default class MyEditor extends Component {
 
   renderMarkButton = (type, name) => {
     return (
-      <button onMouseDown={(event) => this.activateMark(event, type)}>
-        {name}
+      <button
+        onMouseDown={(event) => this.activateMark(event, type)}
+        title={type}>
+        <i class={`fas ${name}`} />
       </button>
     );
   };
@@ -98,21 +100,21 @@ export default class MyEditor extends Component {
     if (type === 'imageBrowser') {
       return (
         <div className="upload-btn-wrapper">
-          <button>
+          <button title={type}>
             <input
               type="file"
               id="input-button"
               onChange={(event) => this.activateBlock(event, type)}
             />
-            {name}
+            <i class={`fas ${name}`} />
           </button>
         </div>
       );
     }
 
     return (
-      <button onClick={(event) => this.activateBlock(event, type)}>
-        {name}
+      <button title={type} onClick={(event) => this.activateBlock(event, type)}>
+        <i class={`fas ${name}`} />
       </button>
     );
   };
@@ -382,19 +384,19 @@ export default class MyEditor extends Component {
               </div>
             </div>
             <div id="toolbar">
-              {this.renderMarkButton('bold', 'b')}
-              {this.renderMarkButton('italic', 'i')}
-              {this.renderMarkButton('underline', 'u')}
-              {this.renderMarkButton('code', '<>')}
-              {this.renderBlockButton('heading-one', 'H1')}
-              {this.renderBlockButton('heading-two', 'H2')}
-              {this.renderBlockButton('paragraph', 'p')}
-              {this.renderBlockButton('code', 'code')}
-              {this.renderBlockButton('blockquote', 'Quote')}
-              {this.renderBlockButton('numbered-list', 'ol')}
-              {this.renderBlockButton('bulleted-list', 'ul')}
-              {this.renderBlockButton('image', 'img src')}
-              {this.renderBlockButton('imageBrowser', 'img upload')}
+              {this.renderMarkButton('bold', 'fa-bold')}
+              {this.renderMarkButton('italic', 'fa-italic')}
+              {this.renderMarkButton('underline', 'fa-underline')}
+              {this.renderMarkButton('code', 'fa-code')}
+              {this.renderBlockButton('heading-one', 'fa-heading')}
+              {this.renderBlockButton('heading-two', 'fa-heading')}
+              {this.renderBlockButton('paragraph', 'fa-paragraph')}
+              {this.renderBlockButton('code', 'fa-terminal')}
+              {this.renderBlockButton('fa-blockquote', 'fa-quote-right')}
+              {this.renderBlockButton('numbered-list', 'fa-list-ol')}
+              {this.renderBlockButton('bulleted-list', 'fa-list-ul')}
+              {this.renderBlockButton('image', 'fa-image')}
+              {this.renderBlockButton('imageBrowser', 'fa-cloud-upload-alt')}
             </div>
           </div>
         </div>
