@@ -7,6 +7,13 @@ document.title = 'Slate Editor Project';
 const storedValue = JSON.parse(localStorage.getItem('content'));
 const value = Value.fromJSON(storedValue || initialValue);
 const DEFAULT_NODE = 'paragraph';
+const schema = {
+  blocks: {
+    image: {
+      isVoid: true
+    }
+  }
+};
 
 function insertImage(editor, src, target) {
   if (target) {
@@ -43,11 +50,23 @@ const plugins = [
  */
 export default class MyEditor extends Component {
   state = {
-    value
+    value,
+    nodeLimit: 0,
+    saveDisabled: false
   };
 
   onChange = ({ value }) => {
     this.setState({ value });
+    let blockSize = this.editor.value.document.getBlocks().size;
+    let { nodeLimit } = this.state;
+    let saveDisabled;
+    if (nodeLimit !== 0 && blockSize > nodeLimit) {
+      saveDisabled = true;
+    } else {
+      saveDisabled = false;
+    }
+
+    this.setState({ saveDisabled });
   };
 
   ref = (editor) => (this.editor = editor);
@@ -316,6 +335,17 @@ export default class MyEditor extends Component {
     localStorage.setItem('content', content);
   };
 
+  // Restore content
+  restoreContent = () => {
+    this.setState({ value });
+  };
+
+  updateNodeLimit = (event) => {
+    event.preventDefault();
+    let limit = parseInt(event.target.limit.value, 10);
+    this.setState({ nodeLimit: limit });
+  };
+
   render() {
     return (
       <div id="shell">
@@ -325,15 +355,32 @@ export default class MyEditor extends Component {
               <div id="title">
                 <h1>Paper</h1>
               </div>
+              <div id="limiter">
+                <form onSubmit={this.updateNodeLimit} action="/" method="POST">
+                  <input
+                    name="limit"
+                    type="number"
+                    defaultValue={0}
+                    className="input-number"
+                  />
+                  <button>Set</button>
+                </form>
+              </div>
               <div id="menu">
-                <button>Cancel</button>
-                <button onClick={this.saveContent}>Save</button>
+                <div className="buttons">
+                  <button onClick={this.restoreContent}>Cancel</button>
+                  <button
+                    disabled={this.state.saveDisabled ? true : false}
+                    onClick={this.saveContent}>
+                    Save
+                  </button>
+                </div>
               </div>
             </div>
             <div id="toolbar">
               {this.renderMarkButton('bold', 'b')}
               {this.renderMarkButton('italic', 'i')}
-              {this.renderMarkButton('underlined', 'u')}
+              {this.renderMarkButton('underline', 'u')}
               {this.renderMarkButton('code', '<>')}
               {this.renderBlockButton('heading-one', 'H1')}
               {this.renderBlockButton('heading-two', 'H2')}
@@ -358,6 +405,7 @@ export default class MyEditor extends Component {
             plugins={plugins}
             renderMark={this.renderMark}
             renderNode={this.renderNode}
+            schema={schema}
           />
         </div>
       </div>

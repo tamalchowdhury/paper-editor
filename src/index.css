@@ -41,13 +41,13 @@ code {
 
 #title-area {
   display: grid;
-  grid-template-columns: 5fr 5fr;
+  grid-template-columns: 3fr 3fr 3fr;
   padding-top: 20px;
 }
 
 #paper {
   background: #fff;
-  padding: 20px;
+  padding: 20px 50px;
   margin-bottom: 20px;
   min-height: 1000px;
 }
@@ -63,4 +63,8 @@ code {
   left: 0;
   top: 0;
   opacity: 0;
+}
+
+.input-number {
+  width: 50px;
 }
