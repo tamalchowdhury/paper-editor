@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { Editor } from 'slate-react';
 import { Value } from 'slate';
 import initialValue from './_value';
-import Icon from './Icon';
 
 document.title = 'Slate Editor Project';
-const value = Value.fromJSON(initialValue);
+const storedValue = JSON.parse(localStorage.getItem('content'));
+const value = Value.fromJSON(storedValue || initialValue);
 const DEFAULT_NODE = 'paragraph';
 
 function insertImage(editor, src, target) {
@@ -310,6 +310,12 @@ export default class MyEditor extends Component {
     return next();
   };
 
+  // Save content
+  saveContent = () => {
+    let content = JSON.stringify(this.state.value.toJSON());
+    localStorage.setItem('content', content);
+  };
+
   render() {
     return (
       <div id="shell">
@@ -321,7 +327,7 @@ export default class MyEditor extends Component {
               </div>
               <div id="menu">
                 <button>Cancel</button>
-                <button>Save</button>
+                <button onClick={this.saveContent}>Save</button>
               </div>
             </div>
             <div id="toolbar">
