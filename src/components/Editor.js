@@ -258,7 +258,6 @@ export default class MyEditor extends Component {
     let isList = this.hasBlock('list-item');
 
     if (!isList) {
-      event.preventDefault();
       return next();
     }
 
