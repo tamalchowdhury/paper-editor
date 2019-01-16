@@ -76,6 +76,21 @@ export default class MyEditor extends Component {
       }
     }
 
+    if (type === 'imageBrowser') {
+      return (
+        <div className="upload-btn-wrapper">
+          <button>
+            <input
+              type="file"
+              id="input-button"
+              onChange={(event) => this.activateBlock(event, type)}
+            />
+            {name}
+          </button>
+        </div>
+      );
+    }
+
     return (
       <button onClick={(event) => this.activateBlock(event, type)}>
         {name}
@@ -108,7 +123,7 @@ export default class MyEditor extends Component {
         new Promise((resolve, reject) => {
           const reader = new FileReader();
           if (file.type !== 'image/jpeg') {
-            alert.error('Only JPEG file');
+            window.alert('Only JPEG file is allowed!');
             return;
           }
           reader.readAsDataURL(file);
@@ -290,6 +305,15 @@ export default class MyEditor extends Component {
       <div id="shell">
         <div id="header">
           <div className="wrapper">
+            <div id="title-area">
+              <div id="title">
+                <h4>Paper</h4>
+              </div>
+              <div id="menu">
+                <button>Cancel</button>
+                <button>Save</button>
+              </div>
+            </div>
             <div id="toolbar">
               {this.renderMarkButton('bold', 'b')}
               {this.renderMarkButton('italic', 'i')}
@@ -305,15 +329,12 @@ export default class MyEditor extends Component {
               {this.renderBlockButton('image', 'img src')}
               {this.renderBlockButton('imageBrowser', 'img upload')}
             </div>
-            <div id="menu">
-              <button>Cancel</button>
-              <button>Save</button>
-            </div>
           </div>
         </div>
         <div id="paper" className="wrapper">
           <Editor
             ref={this.ref}
+            autoFocus
             placeholder="Start writing.."
             value={this.state.value}
             onChange={this.onChange}
