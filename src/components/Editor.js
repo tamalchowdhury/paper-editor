@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import { Editor } from 'slate-react';
 import { Value } from 'slate';
 import initialValue from './_value';
+import sampleValue from './_sample';
 
 document.title = 'Slate Editor Project';
+
 const storedValue = JSON.parse(localStorage.getItem('content'));
 const value = Value.fromJSON(storedValue || initialValue);
 const DEFAULT_NODE = 'paragraph';
@@ -50,7 +52,7 @@ const plugins = [
  */
 export default class MyEditor extends Component {
   state = {
-    value,
+    value: value,
     nodeLimit: 0,
     saveDisabled: false
   };
@@ -130,7 +132,6 @@ export default class MyEditor extends Component {
     const { editor } = this;
     const { value } = editor;
     const { document } = value;
-    const { alert } = this.props;
 
     if (type === 'image') {
       // Show URl prompt
@@ -253,7 +254,14 @@ export default class MyEditor extends Component {
   };
 
   onKeyDown = (event, editor, next) => {
-    let mark;
+    // Do nothing if it's not a list item.
+    let isList = this.hasBlock('list-item');
+
+    if (!isList) {
+      event.preventDefault();
+      return next();
+    }
+
     const { value } = editor;
     const { document } = value;
 
@@ -263,15 +271,7 @@ export default class MyEditor extends Component {
     if (!event.shiftKey && event.key === 'Tab') {
       event.preventDefault();
 
-      const previousSibling = document.getPreviousSibling(block.key);
       const type = !parent.type ? 'bulleted-list' : parent.type;
-      mark = type;
-
-      // If no previous sibling exists, return
-      if (!previousSibling) {
-        event.preventDefault();
-        return next();
-      }
 
       // check whether it's already in 3rd level
       const depth = document.getDepth(block.key);
@@ -287,9 +287,6 @@ export default class MyEditor extends Component {
 
     if (event.shiftKey && event.key == 'Tab') {
       event.preventDefault();
-
-      const type = !parent.type ? 'bulleted-list' : parent.type;
-      mark = type;
 
       // if multi level list items are selected for shift+tab, then return
       const firstBlockDepth = block && document.getDepth(block.key);
@@ -331,6 +328,12 @@ export default class MyEditor extends Component {
     return next();
   };
 
+  // Load Sample content
+  loadSampleContent = () => {
+    let value = Value.fromJSON(sampleValue);
+    this.setState({ value });
+  };
+
   // Save content
   saveContent = () => {
     let content = JSON.stringify(this.state.value.toJSON());
@@ -343,13 +346,19 @@ export default class MyEditor extends Component {
     const storedValue = JSON.parse(localStorage.getItem('content'));
     let value = Value.fromJSON(storedValue || initialValue);
     this.setState({ value });
-    alert('Restored from previous save');
   };
 
   updateNodeLimit = (event) => {
     event.preventDefault();
-    let limit = parseInt(event.target.limit.value, 10);
-    this.setState({ nodeLimit: limit });
+    let nodeLimit = parseInt(event.target.limit.value, 10);
+    let blockSize = this.editor.value.document.getBlocks().size;
+    let saveDisabled;
+    if (nodeLimit !== 0 && blockSize > nodeLimit) {
+      saveDisabled = true;
+    } else {
+      saveDisabled = false;
+    }
+    this.setState({ nodeLimit, saveDisabled });
   };
 
   render() {
@@ -363,6 +372,7 @@ export default class MyEditor extends Component {
               </div>
               <div id="limiter">
                 <form onSubmit={this.updateNodeLimit} action="/" method="POST">
+                  Node limit:&nbsp;
                   <input
                     name="limit"
                     type="number"
@@ -374,6 +384,7 @@ export default class MyEditor extends Component {
               </div>
               <div id="menu">
                 <div className="buttons">
+                  <button onClick={this.loadSampleContent}>Load Sample</button>
                   <button onClick={this.restoreContent}>Cancel</button>
                   <button
                     disabled={this.state.saveDisabled ? true : false}
@@ -387,12 +398,13 @@ export default class MyEditor extends Component {
               {this.renderMarkButton('bold', 'fa-bold')}
               {this.renderMarkButton('italic', 'fa-italic')}
               {this.renderMarkButton('underline', 'fa-underline')}
+              {this.renderMarkButton('strikethrough', 'fa-strikethrough')}
               {this.renderMarkButton('code', 'fa-code')}
               {this.renderBlockButton('heading-one', 'fa-heading')}
               {this.renderBlockButton('heading-two', 'fa-heading')}
               {this.renderBlockButton('paragraph', 'fa-paragraph')}
               {this.renderBlockButton('code', 'fa-terminal')}
-              {this.renderBlockButton('fa-blockquote', 'fa-quote-right')}
+              {this.renderBlockButton('blockquote', 'fa-quote-right')}
               {this.renderBlockButton('numbered-list', 'fa-list-ol')}
               {this.renderBlockButton('bulleted-list', 'fa-list-ul')}
               {this.renderBlockButton('image', 'fa-image')}
@@ -409,9 +421,9 @@ export default class MyEditor extends Component {
             value={this.state.value}
             onChange={this.onChange}
             onKeyDown={this.onKeyDown}
-            plugins={plugins}
             renderMark={this.renderMark}
             renderNode={this.renderNode}
+            plugins={plugins}
             schema={schema}
           />
         </div>

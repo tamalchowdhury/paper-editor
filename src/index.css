@@ -16,6 +16,11 @@ body {
   background: #efefef;
 }
 
+h1,
+h2 {
+  line-height: 1.2em;
+}
+
 img {
   max-width: 100%;
   max-height: auto;
@@ -28,7 +33,17 @@ img {
 }
 
 #header {
-  background: #ddd;
+  background: #7abbff;
+}
+
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+#menu {
+  text-align: right;
 }
 
 #title h1 {
@@ -37,15 +52,25 @@ img {
 
 #title-area {
   display: grid;
-  grid-template-columns: 3fr 3fr 3fr;
+  grid-template-columns: 2fr 3fr 5fr;
   padding-top: 20px;
+  font-size: 0.9rem;
+}
+
+#title-area button {
+  background: #fff;
+  border: 0;
+  border-radius: 3px;
+  margin: 0 5px;
+  padding: 5px 10px;
+  cursor: pointer;
 }
 
 #paper {
   background: #fff;
   padding: 20px 50px;
   margin-bottom: 20px;
-  min-height: 1000px;
+  min-height: 600px;
   box-shadow: 0 10px 10px #ddd;
 }
 
@@ -86,7 +111,7 @@ img {
 }
 
 #toolbar button:hover {
-  color: orange;
+  color: #fff;
 }
 
 pre {
