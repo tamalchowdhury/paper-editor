@@ -1,5 +1,7 @@
 # Paper project with Slate.js
 
+[Demo link](http://paper-editor.divibay.com/)
+
 Install:
 
 `yarn`
