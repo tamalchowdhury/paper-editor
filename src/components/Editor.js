@@ -333,11 +333,15 @@ export default class MyEditor extends Component {
   saveContent = () => {
     let content = JSON.stringify(this.state.value.toJSON());
     localStorage.setItem('content', content);
+    alert('Saved to browser.');
   };
 
   // Restore content
   restoreContent = () => {
+    const storedValue = JSON.parse(localStorage.getItem('content'));
+    let value = Value.fromJSON(storedValue || initialValue);
     this.setState({ value });
+    alert('Restored from previous save');
   };
 
   updateNodeLimit = (event) => {
@@ -398,6 +402,7 @@ export default class MyEditor extends Component {
           <Editor
             ref={this.ref}
             autoFocus
+            spellCheck={false}
             placeholder="Start writing.."
             value={this.state.value}
             onChange={this.onChange}
