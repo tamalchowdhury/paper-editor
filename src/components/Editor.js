@@ -239,7 +239,9 @@ export default class MyEditor extends Component {
     const block = value.blocks.first();
     const parent = block ? document.getParent(block.key) : null;
 
-    if (event.key === 'Tab') {
+    if (!event.shiftKey && event.key === 'Tab') {
+      event.preventDefault();
+
       const previousSibling = document.getPreviousSibling(block.key);
       const type = !parent.type ? 'bulleted-list' : parent.type;
       mark = type;
@@ -260,7 +262,11 @@ export default class MyEditor extends Component {
       if (parent) {
         editor.setBlocks('list-item').wrapBlock(type);
       }
-    } else if (event.key === 'Shift' && event.key === 'Tab') {
+    }
+
+    if (event.shiftKey && event.key == 'Tab') {
+      event.preventDefault();
+
       const type = !parent.type ? 'bulleted-list' : parent.type;
       mark = type;
 
@@ -299,11 +305,9 @@ export default class MyEditor extends Component {
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list');
       }
-    } else {
-      return next();
     }
 
-    event.preventDefault();
+    return next();
   };
 
   render() {
