@@ -122,8 +122,14 @@ export default class MyEditor extends Component {
       const getBase64 = (file) =>
         new Promise((resolve, reject) => {
           const reader = new FileReader();
-          if (file.type !== 'image/jpeg') {
-            window.alert('Only JPEG file is allowed!');
+          const allowedTypes = [
+            'image/jpeg',
+            'image/jpg',
+            'image/png',
+            'image/gif'
+          ];
+          if (!allowedTypes.includes(file.type)) {
+            window.alert('Only jpg, png & gif image files are allowed!');
             return;
           }
           reader.readAsDataURL(file);
@@ -131,7 +137,6 @@ export default class MyEditor extends Component {
           reader.onerror = (error) => reject(error);
         });
       getBase64(event.currentTarget.files[0]).then((imageData) => {
-        // Show image in editor
         editor.command(insertImage, imageData);
       });
     }
@@ -220,6 +225,7 @@ export default class MyEditor extends Component {
       case 'image':
         let src = node.data.get('src');
         return <img src={src} {...attributes} />;
+
       default:
         return next();
     }
@@ -307,7 +313,7 @@ export default class MyEditor extends Component {
           <div className="wrapper">
             <div id="title-area">
               <div id="title">
-                <h4>Paper</h4>
+                <h1>Paper</h1>
               </div>
               <div id="menu">
                 <button>Cancel</button>
@@ -323,7 +329,7 @@ export default class MyEditor extends Component {
               {this.renderBlockButton('heading-two', 'H2')}
               {this.renderBlockButton('paragraph', 'p')}
               {this.renderBlockButton('code', 'code')}
-              {this.renderBlockButton('block-quote', 'Quote')}
+              {this.renderBlockButton('blockquote', 'Quote')}
               {this.renderBlockButton('numbered-list', 'ol')}
               {this.renderBlockButton('bulleted-list', 'ul')}
               {this.renderBlockButton('image', 'img src')}
