@@ -26,6 +26,8 @@ function insertImage(editor, src, target) {
     type: 'image',
     data: { src }
   });
+
+  editor.insertBlock('paragraph');
 }
 
 function MarkHotkeys(options) {
