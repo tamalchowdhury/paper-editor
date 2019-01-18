@@ -307,20 +307,36 @@ export default class MyEditor extends Component {
           .unwrapBlock('numbered-list');
         return next();
       }
+      const depth = document.getDepth(block.key);
 
       const isActive =
         this.hasBlock('list-item') &&
         block &&
         (parent.type === 'numbered-list' || parent.type === 'bulleted-list');
 
+      const onlyList = this.hasBlock('list-item');
+
       if (isActive) {
         editor
           .setBlocks('list-item')
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list');
+      } else if (isActive && depth <= 2) {
+        editor
+          .setBlocks(DEFAULT_NODE)
+          .unwrapBlock('bulleted-list')
+          .unwrapBlock('numbered-list');
       } else {
         editor
           .setBlocks(DEFAULT_NODE)
+          .unwrapBlock('bulleted-list')
+          .unwrapBlock('numbered-list');
+      }
+      // Making sure we don't have an orphan list item
+      if (onlyList && depth <= 2) {
+        editor
+          .setBlocks(DEFAULT_NODE)
+          .unwrapBlock('list-item')
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list');
       }
