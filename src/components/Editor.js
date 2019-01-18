@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Editor } from 'slate-react';
-import { Value } from 'slate';
+import { Editor, getEventRange, getEventTransfer } from 'slate-react';
+import { Block, Value } from 'slate';
 import initialValue from './_value';
 import sampleValue from './_sample';
 
@@ -10,6 +10,17 @@ const storedValue = JSON.parse(localStorage.getItem('content'));
 const value = Value.fromJSON(storedValue || initialValue);
 const DEFAULT_NODE = 'paragraph';
 const schema = {
+  document: {
+    last: { type: 'paragraph' },
+    normalize: (editor, { code, node, child }) => {
+      switch (code) {
+        case 'last_child_type_invalid': {
+          const paragraph = Block.create('paragraph');
+          return editor.insertNodeByKey(node.key, node.nodes.size, paragraph);
+        }
+      }
+    }
+  },
   blocks: {
     image: {
       isVoid: true
@@ -26,8 +37,6 @@ function insertImage(editor, src, target) {
     type: 'image',
     data: { src }
   });
-
-  editor.insertBlock('paragraph');
 }
 
 function MarkHotkeys(options) {
