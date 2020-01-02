@@ -1,6 +1,6 @@
 # Paper project with Slate.js
 
-[Demo link](http://paper-editor.divibay.com/)
+[Demo link](https://tamalanwar.github.io/paper-editor)
 
 Install:
 
